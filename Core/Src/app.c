@@ -97,11 +97,11 @@ void App_Setup(void)
     Sensor_ADC_Init();
     //Sensor_Current_Amp_Offset_Measure();
     // Align rotor
-    Timebase_DownCounter_SS_Set_Securely(1, 500);
+    Timebase_DownCounter_SS_Set_Securely(1, 200);
     Timebase_DownCounter_SS_Set_Securely(2, 1);
-//    Motor_Apply_Phase_Control(MOTOR_PHASE_A, PHASE_MODE_PWM, 100);
-//    Motor_Apply_Phase_Control(MOTOR_PHASE_B, PHASE_MODE_PWM, 100);
-//    Motor_Apply_Phase_Control(MOTOR_PHASE_C, PHASE_MODE_PWM, 100);
+    Motor_Apply_Phase_Control(MOTOR_PHASE_A, PHASE_MODE_PWM, 100);
+    Motor_Apply_Phase_Control(MOTOR_PHASE_B, PHASE_MODE_PWM, 100);
+    Motor_Apply_Phase_Control(MOTOR_PHASE_C, PHASE_MODE_PWM, 100);
     //Sensor_Current_Amp_Offset_Measure();
 //    DRV8301_DC_Cal_High(&drv);
 }
@@ -112,55 +112,19 @@ void App_Setup(void)
 // ---------------- Application Main Loop ----------------
 void App_Main_Loop(void)
 {
-	static uint8_t step = 0;
-
-	if(Timebase_DownCounter_SS_Continuous_Expired_Event(2)){
-		step++;
-		Motor_Commutate_Step(step,30);
-		if(step>=6) step = 0;
-	}
+//	static uint8_t step = 0;
+//
+//	if(Timebase_DownCounter_SS_Continuous_Expired_Event(2)){
+//		step++;
+//		Motor_Commutate_Step(step,30);
+//		if(step>=6) step = 0;
+//	}
 
     if(Timebase_DownCounter_SS_Continuous_Expired_Event(1))
     {
 
-//    	Clarke_t out =  FOC_ClarkeTransform();
-    	//Sensor_ADC_Debug_Print();
         HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-        Debug_Add_Log("ADC_A: %d  | ADC_B: %d \r\n",
-                      (c_asense_adc),
-                      (c_bsense_adc));
-////
-//        Debug_Add_Log("CurrA_A: %ld mA | Curr_B: %ld mA\r\n",
-//                              (long)(Sensor_Get_Phase_A_Current() * 1000.0f),
-//                              (long)(Sensor_Get_Phase_B_Current() * 1000.0f));
-//        Debug_Add_Log("Curr_A ADC Ac = %d  Curr_B ADC = %d  Gain:%d \r\n",adc2_buffer[0],adc2_buffer[1],DRV8301_GetCSAGain(&drv));
-
-
-
-
-    	/* Read gain once */
-    	//gain = DRV8301_GetCSAGain(&drv);
-
-    	/* Debug print (ADC values) */
-//    	Debug_Add_Log("Curr_A ADC = %d  Curr_B ADC = %d  Gain:%d\r\n",
-//    	              adc2_buffer_filtered[0],
-//    	              adc2_buffer_filtered[1],
-//    	              gain);
-//
-//    	/* Debug print (Current values) */
-//    	Debug_Add_Log("Ialpha = %d   Ibeta = %d   Gain:%d\r\n",
-//    	              (int)out.Ialpha,
-//    	              (int)out.Ibeta,
-//    	              (int)gain);
-    	//Sensor_ADC_Debug_Print();
-        // Header
-//        Debug_Add_Log("Curr_A_Ac  Curr_A_Fi  Curr_B_Ac  Curr_B_Fi\r\n");
-//        Debug_Add_Log("-----------------------------------------\r\n");
-
-        // Data row example
-//        Debug_Add_Log("%4d        %4d        %4d        %4d\r\n",
-//                      adc2_buffer[0], adc2_buffer_filtered[0],
-//                      adc2_buffer[1], adc2_buffer_filtered[1]);
+        Sensor_ADC_Debug_Print();
         Debug_Send_Log();
     }
 

@@ -60,21 +60,12 @@ PCD_HandleTypeDef hpcd_USB_FS;
 /* USER CODE BEGIN PV */
 
 TIM_HandleTypeDef htim17;   // <-- Define here
-uint16_t adc1_buffer[2]; // ADC1	[4,11,12,15]
-uint16_t adc2_buffer[4]; // ADC2	[3,4,12,13,17
+volatile uint16_t adc1_buffer[2]; // ADC1	[4,11,12,15]
+volatile uint16_t adc2_buffer[4]; // ADC2	[3,4,12,13,17
 volatile int32_t c_asense_adc = 0;
 volatile int32_t c_bsense_adc = 0;
-uint16_t c_csense_adc;
-uint16_t adc1_buffer_filtered[4]; // ADC1	[4,11,12,15]
-uint16_t adc2_buffer_filtered[3]; // ADC2	[3,4,12,13,17]
-uint16_t adc2_current_a = 0;
-uint16_t adc2_current_b = 0;
-uint16_t adc2_current_a_ffiltered = 0;;
-uint16_t adc2_current_b_filtered = 0;
-float current_offset_a_adc = 0;
-float current_offset_b_adc = 0;
-//uint16_t current_offset_a_adc = 0;
-//uint16_t current_offset_b_adc = 0;
+volatile int32_t c_csense_adc = 0;
+
 uint16_t voltage_a = 0;
 uint16_t voltage_b = 0;
 uint16_t voltage_c = 0;
@@ -249,11 +240,7 @@ static void MX_ADC1_Init(void)
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   hadc1.Init.DMAContinuousRequests = ENABLE;
   hadc1.Init.Overrun = ADC_OVR_DATA_PRESERVED;
-  hadc1.Init.OversamplingMode = ENABLE;
-  hadc1.Init.Oversampling.Ratio = ADC_OVERSAMPLING_RATIO_8;
-  hadc1.Init.Oversampling.RightBitShift = ADC_RIGHTBITSHIFT_3;
-  hadc1.Init.Oversampling.TriggeredMode = ADC_TRIGGEREDMODE_SINGLE_TRIGGER;
-  hadc1.Init.Oversampling.OversamplingStopReset = ADC_REGOVERSAMPLING_RESUMED_MODE;
+  hadc1.Init.OversamplingMode = DISABLE;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
   {
     Error_Handler();
@@ -353,7 +340,7 @@ static void MX_ADC2_Init(void)
   hadc2.Init.ScanConvMode = ADC_SCAN_ENABLE;
   hadc2.Init.EOCSelection = ADC_EOC_SEQ_CONV;
   hadc2.Init.LowPowerAutoWait = DISABLE;
-  hadc2.Init.ContinuousConvMode = DISABLE;
+  hadc2.Init.ContinuousConvMode = ENABLE;
   hadc2.Init.NbrOfConversion = 4;
   hadc2.Init.DiscontinuousConvMode = DISABLE;
   hadc2.Init.ExternalTrigConv = ADC_SOFTWARE_START;
@@ -370,7 +357,7 @@ static void MX_ADC2_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_2;
   sConfig.Rank = ADC_REGULAR_RANK_1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_24CYCLES_5;
+  sConfig.SamplingTime = ADC_SAMPLETIME_47CYCLES_5;
   sConfig.SingleDiff = ADC_SINGLE_ENDED;
   sConfig.OffsetNumber = ADC_OFFSET_NONE;
   sConfig.Offset = 0;
@@ -401,7 +388,6 @@ static void MX_ADC2_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_13;
   sConfig.Rank = ADC_REGULAR_RANK_4;
-  sConfig.SamplingTime = ADC_SAMPLETIME_2CYCLES_5;
   if (HAL_ADC_ConfigChannel(&hadc2, &sConfig) != HAL_OK)
   {
     Error_Handler();

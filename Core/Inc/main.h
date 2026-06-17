@@ -52,21 +52,11 @@ extern DMA_HandleTypeDef hdma_usart3_tx;
 extern DMA_HandleTypeDef hdma_usart3_rx;
 
 extern TIM_HandleTypeDef htim17;  // <-- Declare here for global access
-extern uint16_t adc1_buffer[2]; // ADC1
-extern uint16_t adc2_buffer[4]; // ADC2
+extern volatile uint16_t adc1_buffer[2]; // ADC1
+extern volatile uint16_t adc2_buffer[4]; // ADC2
 extern volatile int32_t c_asense_adc;
 extern volatile int32_t c_bsense_adc;
-extern uint16_t c_csense_adc;
-extern uint16_t adc1_buffer_filtered[4]; // ADC1	[4,11,12,15]
-extern uint16_t adc2_buffer_filtered[3]; // ADC2	[3,4,12,13,17]
-extern uint16_t adc2_current_a;
-extern uint16_t adc2_current_b;
-extern uint16_t adc2_current_a_ffiltered;
-extern uint16_t adc2_current_b_filtered;
-extern float current_offset_a_adc;
-extern float current_offset_b_adc;
-//extern uint16_t current_offset_a_adc;
-//extern uint16_t current_offset_b_adc;
+extern volatile int32_t c_csense_adc;
 extern uint16_t voltage_a;
 extern uint16_t voltage_b;
 extern uint16_t voltage_c;

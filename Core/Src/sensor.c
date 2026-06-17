@@ -76,39 +76,7 @@
 
 void Sensor_Current_Amp_Offset_Measure(void)
 {
-    const uint16_t samples = 1000; // ৫০০ থেকে ১০০০ স্যাম্পল নিলে আরও স্টেবল হবে
-    uint64_t sum_a = 0; // uint64_t ব্যবহার করলে ওভারফ্লো হওয়ার ভয় থাকে না
-    uint64_t sum_b = 0;
 
-    //Motor_Stop();
-    Motor_Apply_Phase_Control(MOTOR_PHASE_A, PHASE_MODE_LOW, 0);
-    Motor_Apply_Phase_Control(MOTOR_PHASE_B, PHASE_MODE_LOW, 0);
-    Motor_Apply_Phase_Control(MOTOR_PHASE_C, PHASE_MODE_LOW, 0);
-    // DC_CAL এনাবল করা (DRV8301 এর ইনপুট শর্ট করে দেয় ইন্টারনালি)
-    HAL_Delay(100); // ২০ms এর বদলে ৫০ms দিলে এমপ্লিফায়ার পুরোপুরি স্টেবল হয়
-
-    uint16_t collected = 0;
-
-    // DMA এর বর্তমান পজিশন ট্র্যাক করার জন্য
-//    uint32_t last_ndtr = DMA1_Channel2->CNDTR;
-
-//    while (collected < samples)
-//    {
-//
-//        // যদি NDTR চেঞ্জ হয়, তার মানে নতুন ডাটা বাফারে এসেছে
-//            sum_a += adc2_current_a; // সরাসরি বাফার থেকে ডাটা যোগ করুন
-//            sum_b += adc2_current_b;
-//            collected++;
-//
-//    }
-
-    // ফাইনাল অফসেট ক্যালকুলেশন
-    current_offset_a_adc = adc2_current_a;//(float)sum_a / samples;
-    current_offset_b_adc = adc2_current_b;//(float)sum_b / samples;
-
-    // ক্যালিব্রেশন শেষে DC_CAL বন্ধ করুন
-
-    Motor_Stop();
 }
 
 
@@ -121,7 +89,7 @@ void Sensor_ADC2_DMA_Start(void){
 	// 2. Setup DMA
 	DMA1_Channel2->CPAR = (uint32_t)&ADC2->DR;
 	DMA1_Channel2->CMAR = (uint32_t)adc2_buffer;
-	DMA1_Channel2->CNDTR = 3;
+	DMA1_Channel2->CNDTR = 4;
 
 	DMA1_Channel2->CCR =
 		  DMA_CCR_MINC
@@ -149,51 +117,24 @@ void Sensor_ADC2_DMA_Start(void){
 // ADC debug print function
 void Sensor_ADC_Debug_Print(void)
 {
-    Debug_Add_Log(
-        "\r\n================== ADC DEBUG ==================\r\n"
+    Debug_Add_Log("=== ADC DEBUG ===\r\n");
 
-        // -------- RAW ADC --------
-        "RAW ADC VALUES:\r\n"
-        "  ADC1:\r\n"
-        "    Va_Sense   : %4u   (IN4)\r\n"
-        "    Temp       : %4u   (IN11)\r\n"
-        "    Bus        : %4u   (IN12)\r\n"
-        "    Total_I    : %4u   (IN15)\r\n"
+    // Current sensing (INA240)
+    Debug_Add_Log("Curr_A ADC : %ld\r\n", (long)c_asense_adc);
+    Debug_Add_Log("Curr_B ADC : %ld\r\n", (long)c_bsense_adc);
+    Debug_Add_Log("Curr_C ADC : %ld\r\n", (long)c_csense_adc);
 
-        "  ADC2:\r\n"
-        "    Ia         : %4u   (IN3)\r\n"
-        "    Ib         : %4u   (IN4)\r\n"
-        "    Vneutral   : %4u   (IN12)\r\n"
-        "    Vc_Sense   : %4u   (IN13)\r\n"
-        "    Vb_Sense   : %4u   (IN17)\r\n"
+    // Phase voltages
+    Debug_Add_Log("Vol_C  ADC : %u\r\n", (uint16_t)adc1_buffer[0]);
+    Debug_Add_Log("Vol_B  ADC : %u\r\n", (uint16_t)adc1_buffer[1]);
+    Debug_Add_Log("Vol_A  ADC : %u\r\n", (uint16_t)adc2_buffer[2]);
 
-        "------------------------------------------------\r\n"
+    // System
+    Debug_Add_Log("Temp   ADC : %u\r\n", (uint16_t)adc2_buffer[0]);
+    Debug_Add_Log("Bus V  ADC : %u\r\n", (uint16_t)adc2_buffer[1]);
+    Debug_Add_Log("Tot_I  ADC : %u\r\n", (uint16_t)adc2_buffer[3]);
 
-        // -------- CALCULATED --------
-        "CALCULATED VALUES:\r\n"
-
-        "  Voltage (x0.1V):\r\n"
-        "    Va = %4d   Vb = %4d   Vc = %4d\r\n"
-
-        "  Current (mA):\r\n"
-        "    Ia = %5d   Ib = %5d   Ic = %5d\r\n"
-
-        "  System:\r\n"
-        "    Bus = %4d   Total_I = %5d\r\n"
-        "    Temp = %4d (0.1C)\r\n"
-
-        "================================================\r\n",
-
-        // RAW ADC
-        adc1_buffer[0], adc1_buffer[1], adc1_buffer[2], adc1_buffer[3],
-		adc2_current_a, adc2_current_b, adc2_buffer[0], adc2_buffer[1], adc2_buffer[2],
-
-        // Calculated
-        (int)voltage_a, (int)voltage_b, (int)voltage_c,
-        (int)current_a, (int)current_b, (int)current_c,
-        (int)bus_voltage, (int)total_current,
-        (int)temperature
-    );
+    Debug_Add_Log("=================\r\n");
 }
 
 
@@ -201,53 +142,11 @@ void Sensor_ADC_Debug_Print(void)
 // ---------- SENSOR LOOP ----------
 void Sensor_Main_Loop_Executable(void)
 {
-    // --------- FILTER RAW ADC VALUES ---------
-    adc1_buffer_filtered[0] = LPF_Run(LPF_ADC1_0, adc1_buffer[0]);
-    adc1_buffer_filtered[1] = LPF_Run(LPF_ADC1_1, adc1_buffer[1]);
-    adc1_buffer_filtered[2] = LPF_Run(LPF_ADC1_2, adc1_buffer[2]);
-    adc1_buffer_filtered[3] = LPF_Run(LPF_ADC1_3, adc1_buffer[3]);
-
-    adc2_buffer_filtered[0] = LPF_Run(LPF_ADC2_0, adc2_current_a);
-    adc2_buffer_filtered[1] = LPF_Run(LPF_ADC2_1, adc2_current_b);
-    adc2_buffer_filtered[2] = LPF_Run(LPF_ADC2_2, adc2_buffer[0]);
-    adc2_buffer_filtered[3] = LPF_Run(LPF_ADC2_3, adc2_buffer[1]);
-    adc2_buffer_filtered[4] = LPF_Run(LPF_ADC2_4, adc2_buffer[2]);
-
-	/* Calculate current */
-	current_a = (PHASE_A_INTERCEPT - adc2_buffer_filtered[0]) * PHASE_A_INV_SLOPE*PHASE_A_CAL_FACTOR;
-	current_b = (PHASE_B_INTERCEPT - adc2_buffer_filtered[1]) * PHASE_B_INV_SLOPE*PHASE_B_CAL_FACTOR;
-	// Deadband filter for Noise reduction
-	if (current_a < 20 && current_a > -20) current_a = 0;
-	if (current_b < 20 && current_b > -20) current_b = 0;
-//    // -------- ADC → Voltage (use filtered values) --------
-    float v_adc1_0 = ((float)adc1_buffer_filtered[0] / ADC_MAX) * VREF;
-    float v_adc1_1 = ((float)adc1_buffer_filtered[1] / ADC_MAX) * VREF;
-    float v_adc1_2 = ((float)adc1_buffer_filtered[2] / ADC_MAX) * VREF;
-    float v_adc1_3 = ((float)adc1_buffer_filtered[3] / ADC_MAX) * VREF;
-
-    float v_adc2_0 = ((float)adc2_buffer_filtered[0] / ADC_MAX) * VREF;
-    float v_adc2_1 = ((float)adc2_buffer_filtered[1] / ADC_MAX) * VREF;
-    float v_adc2_3 = ((float)adc2_buffer_filtered[3] / ADC_MAX) * VREF;
-    float v_adc2_4 = ((float)adc2_buffer_filtered[4] / ADC_MAX) * VREF;
-//
-    // -------- Phase Voltages (scaled ×100) --------
-    voltage_a = 10*v_adc1_0 * ((R_UP + R_DOWN) / R_DOWN)* VOLTAGE_GAIN_CORRECTION;
-    voltage_b = 10*v_adc2_4 * ((R_UP + R_DOWN) / R_DOWN)* VOLTAGE_GAIN_CORRECTION;
-    voltage_c = 10*v_adc2_3 * ((R_UP + R_DOWN) / R_DOWN)* VOLTAGE_GAIN_CORRECTION;
-    bus_voltage = 10*v_adc1_2 * ((R_UP + R_DOWN) / R_DOWN);
-//
-//    // -------- Phase Currents (scaled ×1000) --------
-//    current_a = -((v_adc2_0 - VREF/2.0f) / (CSA_GAIN * SHUNT_RES) - current_offset_a);
-//    current_b = -((v_adc2_1 - VREF/2.0f) / (CSA_GAIN * SHUNT_RES) - current_offset_b);
-    current_c = -(current_a + current_b);
-//
-//    // -------- Total Current (scaled ×1000) --------
-    total_current = 1000*v_adc1_3 / (INA180A2_GAIN * SHUNT_RES);
 //
     // -------- Temperature (scaled ×10) --------
-    float r_ntc = (v_adc1_1 * NTC_R_FIXED) / (VREF - v_adc1_1);
-    float temp_kelvin = 1.0f / ((1.0f/NTC_T0) + (1.0f/NTC_BETA) * logf(r_ntc / NTC_R0));
-    temperature = 10*(temp_kelvin - 273.15f);
+//    float r_ntc = (v_adc1_1 * NTC_R_FIXED) / (VREF - v_adc1_1);
+//    float temp_kelvin = 1.0f / ((1.0f/NTC_T0) + (1.0f/NTC_BETA) * logf(r_ntc / NTC_R0));
+//    temperature = 10*(temp_kelvin - 273.15f);
 }
 
 
@@ -256,7 +155,8 @@ void Sensor_ADC_Init(void){
     HAL_ADCEx_Calibration_Start(&hadc2, ADC_SINGLE_ENDED);
 
     HAL_Delay(10);
-    Sensor_ADC2_DMA_Start();
+    //Sensor_ADC2_DMA_Start();
+    HAL_ADC_Start_DMA(&hadc2, (uint32_t*)adc2_buffer, 4);
     /* Regular channel DMA */
     if (HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc1_buffer, 2) != HAL_OK)
         Error_Handler();
