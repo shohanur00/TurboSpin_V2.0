@@ -99,9 +99,9 @@ void App_Setup(void)
     // Align rotor
     Timebase_DownCounter_SS_Set_Securely(1, 500);
     Timebase_DownCounter_SS_Set_Securely(2, 1);
-    Motor_Apply_Phase_Control(MOTOR_PHASE_A, PHASE_MODE_PWM, 100);
-    Motor_Apply_Phase_Control(MOTOR_PHASE_B, PHASE_MODE_LOW, 100);
-    Motor_Apply_Phase_Control(MOTOR_PHASE_C, PHASE_MODE_LOW, 100);
+//    Motor_Apply_Phase_Control(MOTOR_PHASE_A, PHASE_MODE_PWM, 100);
+//    Motor_Apply_Phase_Control(MOTOR_PHASE_B, PHASE_MODE_PWM, 100);
+//    Motor_Apply_Phase_Control(MOTOR_PHASE_C, PHASE_MODE_PWM, 100);
     //Sensor_Current_Amp_Offset_Measure();
 //    DRV8301_DC_Cal_High(&drv);
 }
@@ -112,7 +112,13 @@ void App_Setup(void)
 // ---------------- Application Main Loop ----------------
 void App_Main_Loop(void)
 {
-	int gain;
+	static uint8_t step = 0;
+
+	if(Timebase_DownCounter_SS_Continuous_Expired_Event(2)){
+		step++;
+		Motor_Commutate_Step(step,30);
+		if(step>=6) step = 0;
+	}
 
     if(Timebase_DownCounter_SS_Continuous_Expired_Event(1))
     {
