@@ -1,5 +1,5 @@
 ../Core/Src/sensor.c:77:6:Sensor_Current_Amp_Offset_Measure	4	static
-../Core/Src/sensor.c:85:6:Sensor_ADC2_DMA_Start	4	static
-../Core/Src/sensor.c:118:6:Sensor_ADC_Debug_Print	8	static
-../Core/Src/sensor.c:143:6:Sensor_Main_Loop_Executable	4	static
-../Core/Src/sensor.c:153:6:Sensor_ADC_Init	8	static
+../Core/Src/sensor.c:85:6:Sensor_ADC2_DMA_Start	16	static
+../Core/Src/sensor.c:129:6:Sensor_ADC_Debug_Print	8	static
+../Core/Src/sensor.c:154:6:Sensor_Main_Loop_Executable	4	static
+../Core/Src/sensor.c:164:6:Sensor_ADC_Init	8	static

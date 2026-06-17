@@ -82,35 +82,46 @@ void Sensor_Current_Amp_Offset_Measure(void)
 
 
 
-void Sensor_ADC2_DMA_Start(void){
-	 // 1. Disable DMA
-	DMA1_Channel2->CCR &= ~DMA_CCR_EN;
+void Sensor_ADC2_DMA_Start(void)
+{
+    /* 1. Disable DMA first */
+    DMA1_Channel2->CCR &= ~DMA_CCR_EN;
 
-	// 2. Setup DMA
-	DMA1_Channel2->CPAR = (uint32_t)&ADC2->DR;
-	DMA1_Channel2->CMAR = (uint32_t)adc2_buffer;
-	DMA1_Channel2->CNDTR = 4;
+    /* 2. Clear DMA flags (important for G4 stability) */
+    DMA1->IFCR |= DMA_IFCR_CTCIF2 | DMA_IFCR_CHTIF2 | DMA_IFCR_CGIF2 | DMA_IFCR_CTEIF2;
 
-	DMA1_Channel2->CCR =
-		  DMA_CCR_MINC
-		| DMA_CCR_CIRC
-		| DMA_CCR_PSIZE_0
-		| DMA_CCR_MSIZE_0;
+    /* 3. Setup DMA */
+    DMA1_Channel2->CPAR  = (uint32_t)&ADC2->DR;
+    DMA1_Channel2->CMAR  = (uint32_t)adc2_buffer;
+    DMA1_Channel2->CNDTR = 4;
 
-	DMA1_Channel2->CCR |= DMA_CCR_EN;
+    DMA1_Channel2->CCR =
+          DMA_CCR_MINC
+        | DMA_CCR_CIRC
+        | DMA_CCR_PSIZE_0   // 16-bit
+        | DMA_CCR_MSIZE_0;  // 16-bit
 
-	// 3. Enable ADC DMA
-	ADC2->CFGR |= ADC_CFGR_DMAEN | ADC_CFGR_DMACFG;
+    DMA1_Channel2->CCR |= DMA_CCR_EN;
 
-	// 4. Enable ADC
-	if (!(ADC2->CR & ADC_CR_ADEN))
-	{
-		ADC2->CR |= ADC_CR_ADEN;
-		while (!(ADC2->ISR & ADC_ISR_ADRDY));
-	}
+    /* 4. Enable ADC DMA mode */
+    ADC2->CFGR |= (ADC_CFGR_DMAEN | ADC_CFGR_DMACFG);
 
-	// 5. Start conversion
-	ADC2->CR |= ADC_CR_ADSTART;
+    /* 5. Proper ADC disable before enable (IMPORTANT for G4) */
+    if (ADC2->CR & ADC_CR_ADEN)
+    {
+        ADC2->CR |= ADC_CR_ADDIS;
+        while (ADC2->CR & ADC_CR_ADEN);
+    }
+
+    /* 6. Small delay for ADC state settle */
+    for (volatile int i = 0; i < 1000; i++);
+
+    /* 7. Enable ADC */
+    ADC2->CR |= ADC_CR_ADEN;
+    while (!(ADC2->ISR & ADC_ISR_ADRDY));
+
+    /* 8. Start conversion */
+    ADC2->CR |= ADC_CR_ADSTART;
 }
 
 
@@ -156,11 +167,12 @@ void Sensor_ADC_Init(void){
 
     HAL_Delay(10);
     //Sensor_ADC2_DMA_Start();
-    HAL_ADC_Start_DMA(&hadc2, (uint32_t*)adc2_buffer, 4);
+//    HAL_ADC_Start_DMA(&hadc2, (uint32_t*)adc2_buffer, 4);
     /* Regular channel DMA */
     if (HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc1_buffer, 2) != HAL_OK)
         Error_Handler();
 
+    Sensor_ADC2_DMA_Start();
     /* Injected channel interrupt — দুটোই start করো */
     HAL_ADCEx_InjectedStart_IT(&hadc1);  // ✅ A, B phase current
     //HAL_ADCEx_InjectedStart_IT(&hadc2);  // ✅ আগে থেকে ছিল
