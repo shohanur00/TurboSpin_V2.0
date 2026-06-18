@@ -9,6 +9,8 @@
 #include "foc_transforms.h"
 
 DRV8301_HandleTypeDef drv;
+// app.c এর উপরে add করো
+extern TIM_HandleTypeDef htim6;
 
 uint8_t current_step = 1;
 
@@ -99,9 +101,10 @@ void App_Setup(void)
     // Align rotor
     Timebase_DownCounter_SS_Set_Securely(1, 200);
     Timebase_DownCounter_SS_Set_Securely(2, 1);
-    Motor_Apply_Phase_Control(MOTOR_PHASE_A, PHASE_MODE_PWM, 100);
-    Motor_Apply_Phase_Control(MOTOR_PHASE_B, PHASE_MODE_PWM, 100);
-    Motor_Apply_Phase_Control(MOTOR_PHASE_C, PHASE_MODE_PWM, 100);
+    HAL_TIM_Base_Start_IT(&htim6);
+//    Motor_Apply_Phase_Control(MOTOR_PHASE_A, PHASE_MODE_PWM, 100);
+//    Motor_Apply_Phase_Control(MOTOR_PHASE_B, PHASE_MODE_PWM, 100);
+//    Motor_Apply_Phase_Control(MOTOR_PHASE_C, PHASE_MODE_PWM, 100);
     //Sensor_Current_Amp_Offset_Measure();
 //    DRV8301_DC_Cal_High(&drv);
 }
@@ -116,7 +119,7 @@ void App_Main_Loop(void)
 //
 //	if(Timebase_DownCounter_SS_Continuous_Expired_Event(2)){
 //		step++;
-//		Motor_Commutate_Step(step,30);
+//		Motor_Commutate_Step(step,50);
 //		if(step>=6) step = 0;
 //	}
 
@@ -157,4 +160,22 @@ void App_Main_Loop(void)
 //    }
 
     Timebase_Main_Loop_Executables();
+}
+
+
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+    if(htim->Instance == TIM17){
+        Timebase_ISR_Executables(); // user-defined ISR function
+    }
+
+    if(htim->Instance == TIM6)
+    {
+        static uint8_t step = 1;
+
+        Motor_Commutate_Step(step, 50);
+        step++;
+        if(step > 6) step = 1;
+    }
 }

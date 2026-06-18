@@ -359,11 +359,13 @@ void TIM1_TRG_COM_TIM17_IRQHandler(void){
     HAL_TIM_IRQHandler(&htim17);  // HAL will call callback
 }
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
-    if(htim->Instance == TIM17){
-        Timebase_ISR_Executables(); // user-defined ISR function
-    }
-}
+//void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
+//    if(htim->Instance == TIM17){
+//        Timebase_ISR_Executables(); // user-defined ISR function
+//    }
+//
+//
+//}
 
 
 

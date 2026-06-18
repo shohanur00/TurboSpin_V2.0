@@ -131,6 +131,8 @@ void Error_Handler(void);
 #define INH_C_GPIO_Port GPIOA
 #define SPI1_CS_Pin GPIO_PIN_15
 #define SPI1_CS_GPIO_Port GPIOA
+#define DSHOT_Pin GPIO_PIN_6
+#define DSHOT_GPIO_Port GPIOB
 #define NOCTW_Pin GPIO_PIN_7
 #define NOCTW_GPIO_Port GPIOB
 
