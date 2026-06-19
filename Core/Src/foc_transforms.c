@@ -4,15 +4,22 @@
 
 #define INV_SQRT3 0.577350269f   // 1/sqrt(3)
 
-// =========================
-// Clarke Transform
-// =========================
-Clarke_t FOC_ClarkeTransform()
+
+Clarke_t Clarke(float ia, float ib)
 {
     Clarke_t out;
 
-    out.Ialpha = current_a;
-    out.Ibeta  = (current_a + 2.0f * current_b) * INV_SQRT3;
+    out.alpha = ia;
+    out.beta  = (ia + 2.0f * ib) * 0.577350269f;
 
+    return out;
+}
+
+// Park
+Park_t Park(Clarke_t c, float sin_theta, float cos_theta)
+{
+    Park_t out;
+    out.d =  c.alpha * cos_theta + c.beta * sin_theta;
+    out.q = -c.alpha * sin_theta + c.beta * cos_theta;
     return out;
 }

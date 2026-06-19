@@ -466,7 +466,7 @@ static void MX_TIM1_Init(void)
   htim1.Init.CounterMode = TIM_COUNTERMODE_CENTERALIGNED1;
   htim1.Init.Period = 4249;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim1.Init.RepetitionCounter = 0;
+  htim1.Init.RepetitionCounter = 1;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim1) != HAL_OK)
   {
@@ -551,7 +551,7 @@ static void MX_TIM6_Init(void)
   htim6.Instance = TIM6;
   htim6.Init.Prescaler = 169;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim6.Init.Period = 128;
+  htim6.Init.Period = 999;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {
@@ -788,22 +788,6 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
-void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef* hadc)
-{
-    if (hadc->Instance == ADC1)
-    {
-        /* Phase A এবং B কারেন্ট রিড */
-        c_asense_adc = HAL_ADCEx_InjectedGetValue(hadc, ADC_INJECTED_RANK_1);
-        c_bsense_adc = HAL_ADCEx_InjectedGetValue(hadc, ADC_INJECTED_RANK_2);
-
-        /* Kirchhoff: Ic = -(Ia + Ib) */
-        //c_csense_adc = -(c_asense_adc + c_bsense_adc);
-
-        updateFlag = 1;
-    }
-    /* ADC2 callback আসলে ignore করো */
-}
 
 /* USER CODE END 4 */
 

@@ -1,7 +1,4 @@
-../Core/Src/app.c:19:6:TIM1_Disable_All	8	static
-../Core/Src/app.c:44:6:TIM1_Pins_To_GPIO	32	static
-../Core/Src/app.c:64:6:DWT_Init	4	static
-../Core/Src/app.c:71:6:delay_us	24	static
-../Core/Src/app.c:81:6:App_Setup	8	static
-../Core/Src/app.c:116:6:App_Main_Loop	8	static
-../Core/Src/app.c:167:6:HAL_TIM_PeriodElapsedCallback	16	static
+../Core/Src/app.c:80:6:App_Setup	8	static
+../Core/Src/app.c:124:6:App_Main_Loop	8	static
+../Core/Src/app.c:160:6:HAL_TIM_PeriodElapsedCallback	16	static
+../Core/Src/app.c:196:6:HAL_ADCEx_InjectedConvCpltCallback	56	static

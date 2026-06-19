@@ -10,5 +10,4 @@
 ../Core/Src/main.c:675:13:MX_USB_PCD_Init	2
 ../Core/Src/main.c:706:13:MX_DMA_Init	1
 ../Core/Src/main.c:734:13:MX_GPIO_Init	1
-../Core/Src/main.c:792:6:HAL_ADCEx_InjectedConvCpltCallback	2
-../Core/Src/main.c:814:6:Error_Handler	1
+../Core/Src/main.c:798:6:Error_Handler	1

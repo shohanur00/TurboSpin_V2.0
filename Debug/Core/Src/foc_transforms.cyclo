@@ -1,1 +1,2 @@
-../Core/Src/foc_transforms.c:10:10:FOC_ClarkeTransform	1
+../Core/Src/foc_transforms.c:8:10:Clarke	1
+../Core/Src/foc_transforms.c:19:8:Park	1
