@@ -2555,51 +2555,52 @@ static void MX_TIM6_Init(void)
  8001334:	4b11      	ldr	r3, [pc, #68]	@ (800137c <MX_TIM6_Init+0x64>)
  8001336:	2200      	movs	r2, #0
  8001338:	609a      	str	r2, [r3, #8]
-  htim6.Init.Period = 999;
+  htim6.Init.Period = 128;
  800133a:	4b10      	ldr	r3, [pc, #64]	@ (800137c <MX_TIM6_Init+0x64>)
- 800133c:	f240 32e7 	movw	r2, #999	@ 0x3e7
- 8001340:	60da      	str	r2, [r3, #12]
+ 800133c:	2280      	movs	r2, #128	@ 0x80
+ 800133e:	60da      	str	r2, [r3, #12]
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
- 8001342:	4b0e      	ldr	r3, [pc, #56]	@ (800137c <MX_TIM6_Init+0x64>)
- 8001344:	2280      	movs	r2, #128	@ 0x80
- 8001346:	619a      	str	r2, [r3, #24]
+ 8001340:	4b0e      	ldr	r3, [pc, #56]	@ (800137c <MX_TIM6_Init+0x64>)
+ 8001342:	2280      	movs	r2, #128	@ 0x80
+ 8001344:	619a      	str	r2, [r3, #24]
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
- 8001348:	480c      	ldr	r0, [pc, #48]	@ (800137c <MX_TIM6_Init+0x64>)
- 800134a:	f007 fbaf 	bl	8008aac <HAL_TIM_Base_Init>
- 800134e:	4603      	mov	r3, r0
- 8001350:	2b00      	cmp	r3, #0
- 8001352:	d001      	beq.n	8001358 <MX_TIM6_Init+0x40>
+ 8001346:	480d      	ldr	r0, [pc, #52]	@ (800137c <MX_TIM6_Init+0x64>)
+ 8001348:	f007 fbb0 	bl	8008aac <HAL_TIM_Base_Init>
+ 800134c:	4603      	mov	r3, r0
+ 800134e:	2b00      	cmp	r3, #0
+ 8001350:	d001      	beq.n	8001356 <MX_TIM6_Init+0x3e>
   {
     Error_Handler();
- 8001354:	f000 f9b4 	bl	80016c0 <Error_Handler>
+ 8001352:	f000 f9b5 	bl	80016c0 <Error_Handler>
   }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
- 8001358:	2300      	movs	r3, #0
- 800135a:	607b      	str	r3, [r7, #4]
+ 8001356:	2300      	movs	r3, #0
+ 8001358:	607b      	str	r3, [r7, #4]
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
- 800135c:	2300      	movs	r3, #0
- 800135e:	60fb      	str	r3, [r7, #12]
+ 800135a:	2300      	movs	r3, #0
+ 800135c:	60fb      	str	r3, [r7, #12]
   if (HAL_TIMEx_MasterConfigSynchronization(&htim6, &sMasterConfig) != HAL_OK)
- 8001360:	1d3b      	adds	r3, r7, #4
- 8001362:	4619      	mov	r1, r3
- 8001364:	4805      	ldr	r0, [pc, #20]	@ (800137c <MX_TIM6_Init+0x64>)
- 8001366:	f009 fa19 	bl	800a79c <HAL_TIMEx_MasterConfigSynchronization>
- 800136a:	4603      	mov	r3, r0
- 800136c:	2b00      	cmp	r3, #0
- 800136e:	d001      	beq.n	8001374 <MX_TIM6_Init+0x5c>
+ 800135e:	1d3b      	adds	r3, r7, #4
+ 8001360:	4619      	mov	r1, r3
+ 8001362:	4806      	ldr	r0, [pc, #24]	@ (800137c <MX_TIM6_Init+0x64>)
+ 8001364:	f009 fa1a 	bl	800a79c <HAL_TIMEx_MasterConfigSynchronization>
+ 8001368:	4603      	mov	r3, r0
+ 800136a:	2b00      	cmp	r3, #0
+ 800136c:	d001      	beq.n	8001372 <MX_TIM6_Init+0x5a>
   {
     Error_Handler();
- 8001370:	f000 f9a6 	bl	80016c0 <Error_Handler>
+ 800136e:	f000 f9a7 	bl	80016c0 <Error_Handler>
   }
   /* USER CODE BEGIN TIM6_Init 2 */
 
   /* USER CODE END TIM6_Init 2 */
 
 }
- 8001374:	bf00      	nop
- 8001376:	3710      	adds	r7, #16
- 8001378:	46bd      	mov	sp, r7
- 800137a:	bd80      	pop	{r7, pc}
+ 8001372:	bf00      	nop
+ 8001374:	3710      	adds	r7, #16
+ 8001376:	46bd      	mov	sp, r7
+ 8001378:	bd80      	pop	{r7, pc}
+ 800137a:	bf00      	nop
  800137c:	20000b90 	.word	0x20000b90
  8001380:	40001000 	.word	0x40001000
 
