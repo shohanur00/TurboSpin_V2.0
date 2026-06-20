@@ -1,0 +1,2 @@
+../Core/Src/svpwm.c:7:21:clamp	24	static
+../Core/Src/svpwm.c:14:6:SVPWM_Update	72	static

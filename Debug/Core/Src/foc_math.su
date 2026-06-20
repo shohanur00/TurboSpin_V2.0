@@ -1,0 +1,13 @@
+../Core/Inc/foc_math.h:45:21:utils_fast_atan2	32	static
+../Core/Inc/foc_math.h:59:21:utils_norm_angle_rad	16	static
+../Core/Inc/foc_math.h:73:21:utils_truncate_number_abs	16	static
+../Core/Inc/foc_math.h:80:21:norm2f	16	static
+../Core/Src/foc_math.c:20:6:foc_init	16	static
+../Core/Src/foc_math.c:32:6:foc_clarke	24	static
+../Core/Src/foc_math.c:41:6:foc_park	40	static
+../Core/Src/foc_math.c:52:6:foc_inv_park	40	static
+../Core/Src/foc_math.c:66:6:foc_observer_update	88	static
+../Core/Src/foc_math.c:135:6:foc_pll_run	40	static
+../Core/Src/foc_math.c:156:7:foc_pi_run	32	static
+../Core/Src/foc_math.c:173:6:foc_svm	112	static
+../Core/Src/foc_math.c:283:6:foc_run	88	static
