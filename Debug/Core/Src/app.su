@@ -2,7 +2,7 @@
 ../Core/Inc/foc_exe.h:32:6:FOC_Init	8	static
 ../Core/Inc/foc_exe.h:49:6:ADC_INJECTED_ISR_EXE	48	static
 ../Core/Inc/foc_exe.h:75:6:FOC_SpeedLoop	24	static
-../Core/Src/app.c:53:6:App_Setup	8	static
-../Core/Src/app.c:88:6:App_Main_Loop	8	static
-../Core/Src/app.c:112:6:HAL_TIM_PeriodElapsedCallback	16	static
-../Core/Src/app.c:147:6:HAL_ADCEx_InjectedConvCpltCallback	40	static
+../Core/Src/app.c:74:6:App_Setup	8	static
+../Core/Src/app.c:110:6:App_Main_Loop	8	static
+../Core/Src/app.c:134:6:HAL_TIM_PeriodElapsedCallback	16	static
+../Core/Src/app.c:171:6:HAL_ADCEx_InjectedConvCpltCallback	104	static

@@ -19,11 +19,7 @@
 /* ================================================================== */
 void foc_init(foc_state_t *s, float gamma)
 {
-    memset(s, 0, sizeof(foc_state_t));
-    s->gamma               = gamma;
-    s->obs.lambda_est      = FOC_MOTOR_FLUX_LINKAGE;
-    /* Seed x1 so we don't start at zero magnitude */
-    s->obs.x1              = FOC_MOTOR_FLUX_LINKAGE;
+
 }
 
 /* ================================================================== */
@@ -63,71 +59,56 @@ void foc_inv_park(float d, float q, float theta, float *alpha, float *beta)
 /*  state->x1, x2  are  ψα, ψβ  (flux linkage estimates)              */
 /*  phase output   is   atan2(x2 - L·iβ, x1 - L·iα)                  */
 /* ================================================================== */
-void foc_observer_update(float v_alpha, float v_beta,
-                         float i_alpha, float i_beta,
-                         float dt, observer_state_t *state,
-                         float *phase)
-{
-    const float R      = FOC_MOTOR_R;
-    const float L      = FOC_MOTOR_L;
-    const float lambda = FOC_MOTOR_FLUX_LINKAGE;
+// observer_ortega.c
 
-    float L_ia = L * i_alpha;
-    float L_ib = L * i_beta;
+#define OBS_GAMMA       500.0f
+#define MOTOR_RS        0.05f      // phase resistance (Ω) — measure করতে হবে
+#define MOTOR_PSI_NOM   0.003f     // nominal flux (Wb) — datasheet বা measure
 
-    float R_ia = R * i_alpha;
-    float R_ib = R * i_beta;
+typedef struct {
+    float psi_alpha;   // flux estimate α
+    float psi_beta;    // flux estimate β
+    float theta;       // estimated angle (rad)
+    float omega;       // estimated angular velocity (rad/s)
+    float theta_prev;  // previous angle for omega calculation
+} OrtegaObs_t;
 
-    float gamma_half = state->lambda_est * state->lambda_est;   /* reused below */
-
-    /* ---- Ortega Original ----------------------------------------- */
-    /*
-     * err = λ² - |ψ - L·i|²
-     * Clamp err ≤ 0  (forces convergence, see paper)
-     */
-    float err = SQ(lambda) - (SQ(state->x1 - L_ia) + SQ(state->x2 - L_ib));
-
-    if (err > 0.0f) {
-        err = 0.0f;
-    }
-
-    /*
-     * gamma_half is ½ · γ  in the paper.
-     * We store plain γ in foc_state_t and pass lambda_est here as a
-     * stand-in initialised value; the actual gain comes from the caller
-     * via the state struct field used below.
-     *
-     * Practical default: γ ≈ 1000  (tune for your motor speed range)
-     */
-    gamma_half = state->lambda_est;   /* re-purpose field as gain carrier */
-    /* NOTE: caller sets state->lambda_est = gamma on init so the field
-       doubles as the gain.  If you want proper lambda adaptation, switch
-       to FOC_OBSERVER_ORTEGA_LAMBDA_COMP variant below.             */
-
-    float x1_dot = v_alpha - R_ia + gamma_half * (state->x1 - L_ia) * err;
-    float x2_dot = v_beta  - R_ib + gamma_half * (state->x2 - L_ib) * err;
-
-    state->x1 += x1_dot * dt;
-    state->x2 += x2_dot * dt;
-
-    state->i_alpha_last = i_alpha;
-    state->i_beta_last  = i_beta;
-
-    /* Protect against NaN */
-    UTILS_NAN_ZERO(state->x1);
-    UTILS_NAN_ZERO(state->x2);
-
-    /* If magnitude collapses, rescale to avoid unstable angle */
-    float mag = norm2f(state->x1, state->x2);
-    if (mag < (lambda * 0.5f)) {
-        state->x1 *= 1.1f;
-        state->x2 *= 1.1f;
-    }
-
-    if (phase) {
-        *phase = utils_fast_atan2(state->x2 - L_ib, state->x1 - L_ia);
-    }
-}
+//void Ortega_Update(OrtegaObs_t *obs,
+//                   float v_alpha, float v_beta,
+//                   float i_alpha, float i_beta,
+//                   float Ts)
+//{
+//    // |ψ|² - ψ_nom²
+//    float psi_sq = obs->psi_alpha * obs->psi_alpha
+//                 + obs->psi_beta  * obs->psi_beta;
+//    float psi_nom_sq = MOTOR_PSI_NOM * MOTOR_PSI_NOM;
+//    float err = psi_sq - psi_nom_sq;
+//
+//    // dψα/dt = Vα - Rs·Iα - γ·err·ψα
+//    float dpsi_alpha = v_alpha
+//                     - MOTOR_RS * i_alpha
+//                     - OBS_GAMMA * err * obs->psi_alpha;
+//
+//    // dψβ/dt = Vβ - Rs·Iβ - γ·err·ψβ
+//    float dpsi_beta  = v_beta
+//                     - MOTOR_RS * i_beta
+//                     - OBS_GAMMA * err * obs->psi_beta;
+//
+//    // Forward Euler integration
+//    obs->psi_alpha += dpsi_alpha * Ts;
+//    obs->psi_beta  += dpsi_beta  * Ts;
+//
+//    // Angle extraction
+//    obs->theta_prev = obs->theta;
+//    obs->theta = atan2f(obs->psi_beta, obs->psi_alpha);
+//
+//    // Angular velocity (numerical derivative, unwrapped)
+//    float d_theta = obs->theta - obs->theta_prev;
+//    // Unwrap
+//    if (d_theta >  M_PI) d_theta -= 2.0f * M_PI;
+//    if (d_theta < -M_PI) d_theta += 2.0f * M_PI;
+//    obs->omega = d_theta / Ts;
+//}
 
 /* ================================================================== */
 /*  PLL  (tracks observer phase, gives smoothed speed)                  */

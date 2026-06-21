@@ -6,6 +6,7 @@
 "./Core/Src/llrlpf.o"
 "./Core/Src/main.o"
 "./Core/Src/motor.o"
+"./Core/Src/observer_ortega.o"
 "./Core/Src/pi.o"
 "./Core/Src/sensor.o"
 "./Core/Src/smo.o"

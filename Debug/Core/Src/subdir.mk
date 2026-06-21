@@ -13,6 +13,7 @@ C_SRCS += \
 ../Core/Src/llrlpf.c \
 ../Core/Src/main.c \
 ../Core/Src/motor.c \
+../Core/Src/observer_ortega.c \
 ../Core/Src/pi.c \
 ../Core/Src/sensor.c \
 ../Core/Src/smo.c \
@@ -33,6 +34,7 @@ OBJS += \
 ./Core/Src/llrlpf.o \
 ./Core/Src/main.o \
 ./Core/Src/motor.o \
+./Core/Src/observer_ortega.o \
 ./Core/Src/pi.o \
 ./Core/Src/sensor.o \
 ./Core/Src/smo.o \
@@ -53,6 +55,7 @@ C_DEPS += \
 ./Core/Src/llrlpf.d \
 ./Core/Src/main.d \
 ./Core/Src/motor.d \
+./Core/Src/observer_ortega.d \
 ./Core/Src/pi.d \
 ./Core/Src/sensor.d \
 ./Core/Src/smo.d \
@@ -72,7 +75,7 @@ Core/Src/%.o Core/Src/%.su Core/Src/%.cyclo: ../Core/Src/%.c Core/Src/subdir.mk
 clean: clean-Core-2f-Src
 
 clean-Core-2f-Src:
-	-$(RM) ./Core/Src/app.cyclo ./Core/Src/app.d ./Core/Src/app.o ./Core/Src/app.su ./Core/Src/debug.cyclo ./Core/Src/debug.d ./Core/Src/debug.o ./Core/Src/debug.su ./Core/Src/drv8301.cyclo ./Core/Src/drv8301.d ./Core/Src/drv8301.o ./Core/Src/drv8301.su ./Core/Src/foc_math.cyclo ./Core/Src/foc_math.d ./Core/Src/foc_math.o ./Core/Src/foc_math.su ./Core/Src/foc_transforms.cyclo ./Core/Src/foc_transforms.d ./Core/Src/foc_transforms.o ./Core/Src/foc_transforms.su ./Core/Src/llrlpf.cyclo ./Core/Src/llrlpf.d ./Core/Src/llrlpf.o ./Core/Src/llrlpf.su ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/motor.cyclo ./Core/Src/motor.d ./Core/Src/motor.o ./Core/Src/motor.su ./Core/Src/pi.cyclo ./Core/Src/pi.d ./Core/Src/pi.o ./Core/Src/pi.su ./Core/Src/sensor.cyclo ./Core/Src/sensor.d ./Core/Src/sensor.o ./Core/Src/sensor.su ./Core/Src/smo.cyclo ./Core/Src/smo.d ./Core/Src/smo.o ./Core/Src/smo.su ./Core/Src/stm32g4xx_hal_msp.cyclo ./Core/Src/stm32g4xx_hal_msp.d ./Core/Src/stm32g4xx_hal_msp.o ./Core/Src/stm32g4xx_hal_msp.su ./Core/Src/stm32g4xx_it.cyclo ./Core/Src/stm32g4xx_it.d ./Core/Src/stm32g4xx_it.o ./Core/Src/stm32g4xx_it.su ./Core/Src/svpwm.cyclo ./Core/Src/svpwm.d ./Core/Src/svpwm.o ./Core/Src/svpwm.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32g4xx.cyclo ./Core/Src/system_stm32g4xx.d ./Core/Src/system_stm32g4xx.o ./Core/Src/system_stm32g4xx.su ./Core/Src/timebase.cyclo ./Core/Src/timebase.d ./Core/Src/timebase.o ./Core/Src/timebase.su
+	-$(RM) ./Core/Src/app.cyclo ./Core/Src/app.d ./Core/Src/app.o ./Core/Src/app.su ./Core/Src/debug.cyclo ./Core/Src/debug.d ./Core/Src/debug.o ./Core/Src/debug.su ./Core/Src/drv8301.cyclo ./Core/Src/drv8301.d ./Core/Src/drv8301.o ./Core/Src/drv8301.su ./Core/Src/foc_math.cyclo ./Core/Src/foc_math.d ./Core/Src/foc_math.o ./Core/Src/foc_math.su ./Core/Src/foc_transforms.cyclo ./Core/Src/foc_transforms.d ./Core/Src/foc_transforms.o ./Core/Src/foc_transforms.su ./Core/Src/llrlpf.cyclo ./Core/Src/llrlpf.d ./Core/Src/llrlpf.o ./Core/Src/llrlpf.su ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/motor.cyclo ./Core/Src/motor.d ./Core/Src/motor.o ./Core/Src/motor.su ./Core/Src/observer_ortega.cyclo ./Core/Src/observer_ortega.d ./Core/Src/observer_ortega.o ./Core/Src/observer_ortega.su ./Core/Src/pi.cyclo ./Core/Src/pi.d ./Core/Src/pi.o ./Core/Src/pi.su ./Core/Src/sensor.cyclo ./Core/Src/sensor.d ./Core/Src/sensor.o ./Core/Src/sensor.su ./Core/Src/smo.cyclo ./Core/Src/smo.d ./Core/Src/smo.o ./Core/Src/smo.su ./Core/Src/stm32g4xx_hal_msp.cyclo ./Core/Src/stm32g4xx_hal_msp.d ./Core/Src/stm32g4xx_hal_msp.o ./Core/Src/stm32g4xx_hal_msp.su ./Core/Src/stm32g4xx_it.cyclo ./Core/Src/stm32g4xx_it.d ./Core/Src/stm32g4xx_it.o ./Core/Src/stm32g4xx_it.su ./Core/Src/svpwm.cyclo ./Core/Src/svpwm.d ./Core/Src/svpwm.o ./Core/Src/svpwm.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32g4xx.cyclo ./Core/Src/system_stm32g4xx.d ./Core/Src/system_stm32g4xx.o ./Core/Src/system_stm32g4xx.su ./Core/Src/timebase.cyclo ./Core/Src/timebase.d ./Core/Src/timebase.o ./Core/Src/timebase.su
 
 .PHONY: clean-Core-2f-Src
 
