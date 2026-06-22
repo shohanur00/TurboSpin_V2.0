@@ -2,9 +2,13 @@
 #include "observer_ortega.h"
 #include <math.h>
 
-#define OBS_GAMMA     500.0f
-#define MOTOR_RS      0.09f       // তোমার MOTOR_R এর সাথে match
-#define MOTOR_PSI_NOM 0.008f      // শুরুতে এটা দিয়ে try করো
+#define MOTOR_PSI_NOM 0.025f  // actual observed magnitude
+#define OBS_GAMMA     100.0f   // আরো কমাও
+#define MOTOR_RS      0.09f
+
+
+#define PSI_MIN (0.2f * MOTOR_PSI_NOM)
+#define PSI_MAX (2.0f * MOTOR_PSI_NOM)
 
 void Ortega_Init(OrtegaObs_t *obs)
 {
@@ -36,13 +40,36 @@ void Ortega_Update(OrtegaObs_t *obs,
     obs->psi_alpha += dpsi_alpha * Ts;
     obs->psi_beta  += dpsi_beta  * Ts;
 
+    float mag = sqrtf(obs->psi_alpha * obs->psi_alpha +
+                      obs->psi_beta  * obs->psi_beta);
+
+    if (mag > PSI_MAX)
+    {
+        float k = PSI_MAX / mag;
+        obs->psi_alpha *= k;
+        obs->psi_beta  *= k;
+    }
+    else if (mag < PSI_MIN && mag > 1e-6f)
+    {
+        float k = PSI_MIN / mag;
+        obs->psi_alpha *= k;
+        obs->psi_beta  *= k;
+    }
+
     // Angle
     obs->theta_prev = obs->theta;
-    obs->theta      = atan2f(obs->psi_beta, obs->psi_alpha);
+    // observer_ortega.c এ theta calculation এ:
+    obs->theta = atan2f(obs->psi_beta, obs->psi_alpha);
+
+    // Wrap করো -π to +π এ:
+    if(obs->theta >  3.14159f) obs->theta -= 6.28318f;
+    if(obs->theta < -3.14159f) obs->theta += 6.28318f;
 
     // Omega (unwrapped)
     float dtheta = obs->theta - obs->theta_prev;
     if (dtheta >  3.14159f) dtheta -= 6.28318f;
     if (dtheta < -3.14159f) dtheta += 6.28318f;
-    obs->omega = dtheta / Ts;
+    float omega_new = dtheta / Ts;
+
+    obs->omega += 0.05f * (omega_new - obs->omega);
 }
